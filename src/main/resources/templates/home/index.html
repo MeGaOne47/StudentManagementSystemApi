@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ỨNG DỤNG QUẢN LÝ HỌC VIÊN</title>
+    <th:block th:replace="layout :: Link-css"></th:block>
+    <style>
+        .center-anchor {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+<th:block th:replace="layout :: header"></th:block>
+<div class="container">
+    <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+            <div class="center-anchor">
+                <a class="navbar-brand" href="#">
+                    TRANG CHỦ ỨNG DỤNG QUẢN LÝ HỌC VIÊN - KẾT NỐI CSDL MYSQL
+                </a>
+            </div>
+        </div>
+    </nav>
+</div>
+<th:block th:replace="layout :: footer"></th:block>
+</body>
+</html>
+1

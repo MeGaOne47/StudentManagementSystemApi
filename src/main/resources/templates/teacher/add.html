@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.springframework.org/schema/security" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Teacher</title>
+    <th:block th:replace="layout :: Link-css"></th:block>
+    <style>
+        .container {
+            margin-top: 100px;
+        }
+         .error-message {
+            color: red;
+         }
+    </style>
+</head>
+<body>
+<th:block th:replace="layout :: header"></th:block>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="text-center">Add Teacher</h1>
+            <div th:if="${errorMessage}" class="alert alert-danger">
+                <p th:text="${errorMessage}"></p>
+            </div>
+            <form id="addTeacherForm" th:action="@{/api/v1/teachers}" method="post" th:object="${teacher}">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                    <p class="error-message"></p>
+                </div>
+                <div class="form-group">
+                    <label for="age">Age:</label>
+                    <input type="number" class="form-control" id="age" th:field="*{age}" required>
+                    <p class="error-message"></p>
+                </div>
+                <div class="form-group">
+                    <label for="course">Course:</label>
+                    <select class="form-control" id="course" th:field="*{course}" required>
+                        <option value="">Select a course</option>
+                        <option th:each="course : ${courses}" th:value="${course}" th:text="${course.name}"></option>
+                    </select>
+                    <p class="error-message"></p>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Add</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/jquery-3.6.4.min.js}"></script>
+<script th:src="@{/js/jquery.validate.min.js}"></script>
+<script th:src="@{/js/teacher/add.js}"></script>
+<th:block th:replace="layout :: footer"></th:block>
+</body>
+</html>

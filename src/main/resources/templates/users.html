@@ -1,0 +1,52 @@
+<!-- usersTracking.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Users</title>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <th:block th:replace="layout :: Link-css"></th:block>
+</head>
+<body>
+<th:block th:replace="layout :: header"></th:block>
+<h1>Admin Users</h1>
+<table class="table">
+  <thead class="table-dark">
+  <tr>
+    <th>Username</th>
+    <th>Email</th>
+    <th>Roles</th>
+    <th>Action</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="user : ${users}">
+    <td th:text="${user.username}"></td>
+    <td th:text="${user.email}"></td>
+    <td>
+      <ul>
+        <li th:each="role : ${user.roles}" th:text="${role.name}"></li>
+      </ul>
+    </td>
+    <td>
+      <form th:action="@{/admin/users/{userId}/role(userId=${user.id})}" method="post">
+        <input type="hidden" name="userId" th:value="${user.id}" />
+        <select name="roleId" class="form-select">
+          <option th:each="role : ${roles}"
+                  th:value="${role.id}"
+                  th:text="${role.name}"
+                  th:selected="${role.id == userCurrentRoles[user.id]?.id}"
+                  th:with="selectedRole=${userCurrentRoles[user.id]}"></option>
+        </select>
+        <button type="submit" class="btn btn-primary">Update Role</button>
+      </form>
+    </td>
+  </tr>
+  </tbody>
+</table>
+<th:block th:replace="layout :: footer"></th:block>
+
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

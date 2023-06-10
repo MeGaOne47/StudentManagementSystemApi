@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.springframework.org/schema/security" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Class</title>
+  <th:block th:replace="layout :: Link-css"></th:block>
+  <style>
+        .container {
+            margin-top: 100px;
+        }
+    </style>
+</head>
+<body>
+<th:block th:replace="layout :: header"></th:block>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <h1 class="text-center">Edit Class</h1>
+      <div th:if="${errorMessage}" class="alert alert-danger">
+        <p th:text="${errorMessage}"></p>
+      </div>
+      <form id="editClassForm" th:action="@{'/api/v1/classes/' + ${classDto.id}}" method="post" th:object="${classDto}">
+        <div class="form-group">
+          <label for="name">ClassName:</label>
+          <input type="text" class="form-control" id="name" th:field="*{className}" required>
+        </div>
+        <div class="form-group">
+          <label for="description">ClassDescription:</label>
+          <textarea class="form-control" id="description" th:field="*{classDescription}" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="teacher">Teacher:</label>
+          <select class="form-control" id="teacher" th:field="*{teacher.id}">
+            <option th:each="teacher : ${teachers}" th:value="${teacher.id}" th:text="${teacher.name}"
+                    th:selected="${teacher.id == classDto.teacher?.id}"></option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Update</button>
+      </form>
+    </div>
+  </div>
+</div>
+<script th:src="@{/js/jquery-3.6.4.min.js}"></script>
+<script th:src="@{/js/class/edit.js}"></script>
+<th:block th:replace="layout :: footer"></th:block>
+</body>
+</html>
