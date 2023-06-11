@@ -5,10 +5,13 @@
   <title>Edit Class</title>
   <th:block th:replace="layout :: Link-css"></th:block>
   <style>
-        .container {
-            margin-top: 100px;
-        }
-    </style>
+    .container {
+      margin-top: 100px;
+    }
+    .error-message {
+      color: red;
+    }
+  </style>
 </head>
 <body>
 <th:block th:replace="layout :: header"></th:block>
@@ -21,18 +24,17 @@
       </div>
       <form id="editClassForm" th:action="@{'/api/v1/classes/' + ${classDto.id}}" method="post" th:object="${classDto}">
         <div class="form-group">
-          <label for="name">ClassName:</label>
-          <input type="text" class="form-control" id="name" th:field="*{className}" required>
+          <label for="name">Class Name:</label>
+          <input type="text" class="form-control" id="name" th:field="*{name}" required>
         </div>
         <div class="form-group">
-          <label for="description">ClassDescription:</label>
-          <textarea class="form-control" id="description" th:field="*{classDescription}" required></textarea>
+          <label for="description">Class Description:</label>
+          <textarea class="form-control" id="description" th:field="*{description}" required></textarea>
         </div>
         <div class="form-group">
           <label for="teacher">Teacher:</label>
-          <select class="form-control" id="teacher" th:field="*{teacher.id}">
-            <option th:each="teacher : ${teachers}" th:value="${teacher.id}" th:text="${teacher.name}"
-                    th:selected="${teacher.id == classDto.teacher?.id}"></option>
+          <select class="form-control" id="teacher" name="teacherName" th:field="*{teacherName}" required>
+            <option th:each="teacher : ${teachers}" th:value="${teacher.name}" th:text="${teacher.name}" th:selected="${teacher.name == classDto.teacherName}"></option>
           </select>
         </div>
         <button type="submit" class="btn btn-primary btn-block">Update</button>
@@ -41,6 +43,7 @@
   </div>
 </div>
 <script th:src="@{/js/jquery-3.6.4.min.js}"></script>
+<script th:src="@{/js/jquery.validate.min.js}"></script>
 <script th:src="@{/js/class/edit.js}"></script>
 <th:block th:replace="layout :: footer"></th:block>
 </body>

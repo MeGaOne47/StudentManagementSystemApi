@@ -1,3 +1,50 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta http-equiv="X-UA-Compatible" content="IE=edge">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Login</title>-->
+<!--    <th:block th:replace="~{layout :: Link-css}"></th:block> </head>-->
+<!--<body>-->
+<!--<th:block th:replace="~{layout :: header}"></th:block>-->
+<!--<div class="container">-->
+<!--    <div class="row justify-content-center">-->
+<!--        <div class="col-lg-6 col-md-8">-->
+<!--            <h3 class="card-title text-center">Login</h3>-->
+<!--            <form th:action="@{/login}" method="post">-->
+<!--                <fieldset>-->
+<!--                    <legend>Please login</legend>-->
+<!--                    <div th:if="${param.error}" class="alert alert-danger">-->
+<!--                        Invalid username and password.-->
+<!--                    </div>-->
+<!--                    <div th:if="${param.logout}" class="alert alert-success">-->
+<!--                        You have been logged out.-->
+<!--                    </div>-->
+<!--                    <div class="mb-3">-->
+<!--                        <label for="username" class="form-label">Username: </label>-->
+<!--                        <input type="text" required class="form-control" id="username" name="username">-->
+<!--                    </div>-->
+<!--                    <div class="mb-3">-->
+<!--                        <label for="password" class="form-label">Password:</label>-->
+<!--                        <input type="password" required class="form-control" id="password" name="password"> </div>-->
+<!--                    <div class="mb-3">-->
+<!--                        <input type="checkbox" name="remember-me" id="remember-me">-->
+<!--                        <label for="remember-me">Remember me</label>-->
+<!--                    </div>-->
+<!--                    <div class="d-grid gap-2 form-action">-->
+<!--                        <button type="submit" class="btn btn-primary">Login</button>-->
+<!--                        <a class="text-primary text-center" href="/register">Don't have account. Sign up?</a>-->
+<!--                    </div>-->
+<!--                </fieldset>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<!--<th:block th:replace="~{layout :: footer}"></th:block>-->
+<!--</body>-->
+<!--</html>-->
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -5,7 +52,37 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <th:block th:replace="~{layout :: Link-css}"></th:block> </head>
+    <th:block th:replace="~{layout :: Link-css}"></th:block>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 100px;
+        }
+        .card-title {
+            color: #343a40;
+        }
+        .form-label {
+            color: #343a40;
+        }
+        .form-control {
+            border-color: #6c757d;
+            color: #6c757d;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+        .text-primary {
+            color: #007bff;
+        }
+    </style>
+</head>
 <body>
 <th:block th:replace="~{layout :: header}"></th:block>
 <div class="container">
@@ -27,14 +104,15 @@
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password:</label>
-                        <input type="password" required class="form-control" id="password" name="password"> </div>
+                        <input type="password" required class="form-control" id="password" name="password">
+                    </div>
                     <div class="mb-3">
                         <input type="checkbox" name="remember-me" id="remember-me">
                         <label for="remember-me">Remember me</label>
                     </div>
                     <div class="d-grid gap-2 form-action">
                         <button type="submit" class="btn btn-primary">Login</button>
-                        <a class="text-primary text-center" href="/register">Don't have account. Sign up?</a>
+                        <a class="text-primary text-center" href="/register">Don't have an account? Sign up</a>
                     </div>
                 </fieldset>
             </form>
@@ -44,3 +122,4 @@
 <th:block th:replace="~{layout :: footer}"></th:block>
 </body>
 </html>
+

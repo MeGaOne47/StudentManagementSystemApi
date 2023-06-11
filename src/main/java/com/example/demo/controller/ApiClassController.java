@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.ClassDto;
-import com.example.demo.dto.TeacherDto;
 import com.example.demo.entity.ClassEntity;
 import com.example.demo.entity.Teacher;
 import com.example.demo.services.ClassService;
@@ -9,10 +8,11 @@ import com.example.demo.services.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin("*")
@@ -27,100 +27,86 @@ public class ApiClassController {
     @GetMapping
     public ResponseEntity<List<ClassDto>> getAllClasses() {
         List<ClassEntity> classes = classService.getAllClasses();
-        List<ClassDto> classDtos = classes.stream()
-                .map(this::convertToClassDto)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(classDtos);
+        List<ClassDto> classDTOs = new ArrayList<>();
+        for (ClassEntity cls : classes) {
+            classDTOs.add(convertToClassDto(cls));
+        }
+        return ResponseEntity.ok(classDTOs);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ClassDto> getClassById(@PathVariable Long id) {
-        ClassEntity classEntity = classService.getClassById(id);
-        if (classEntity == null) {
-            return ResponseEntity.notFound().build();
+        ClassEntity cls = classService.getClassById(id);
+        if (cls != null) {
+            ClassDto classDto = convertToClassDto(cls);
+            return ResponseEntity.ok(classDto);
         }
-        ClassDto classDto = convertToClassDto(classEntity);
-        return ResponseEntity.ok(classDto);
-    }
-
-    @PostMapping
-    public ResponseEntity<ClassDto> addClass(@RequestBody ClassDto classDto) {
-        ClassEntity classEntity = convertToClassEntity(classDto);
-
-        // Lấy giáo viên từ ID
-        Teacher teacher = teacherService.getTeacherById(classDto.getTeacher().getId());
-        classEntity.setTeacher(teacher);
-
-        classService.addClass(classEntity);
-        classDto.setId(classEntity.getId());
-
-        // Lấy thông tin giáo viên và gán cho classDto
-        TeacherDto teacherDto = convertToTeacherDto(teacher);
-        classDto.setTeacher(teacherDto);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(classDto);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ClassDto> updateClass(@PathVariable Long id, @RequestBody ClassDto classDto) {
-        ClassEntity existingClassEntity = classService.getClassById(id);
-        if (existingClassEntity == null) {
-            return ResponseEntity.notFound().build();
-        }
-        ClassEntity updatedClassEntity = convertToClassEntity(classDto);
-
-        // Lấy giáo viên từ ID
-        Teacher teacher = teacherService.getTeacherById(classDto.getTeacher().getId());
-        updatedClassEntity.setTeacher(teacher);
-
-        updatedClassEntity.setId(existingClassEntity.getId());
-        classService.updateClass(updatedClassEntity);
-
-        // Lấy thông tin giáo viên và gán cho classDto
-        TeacherDto teacherDto = convertToTeacherDto(teacher);
-        classDto.setTeacher(teacherDto);
-
-        return ResponseEntity.ok(classDto);
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteClass(@PathVariable Long id) {
-        ClassEntity classEntity = classService.getClassById(id);
-        if (classEntity == null) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<String> deleteClass(@PathVariable Long id) {
+        if (classService.getClassById(id) != null) {
+            classService.deleteClass(id);
+            return ResponseEntity.ok("Class deleted successfully!");
         }
-        classService.deleteClass(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.notFound().build();
     }
 
-    private ClassDto convertToClassDto(ClassEntity classEntity) {
-        ClassDto classDto = new ClassDto();
-        classDto.setId(classEntity.getId());
-        classDto.setClassName(classEntity.getClassName());
-        classDto.setClassDescription(classEntity.getClassDescription());
+    @PostMapping
+    public ResponseEntity<String> addClass(@RequestBody ClassDto classDto) {
+        try {
+            // Convert ClassDto to ClassEntity
+            ClassEntity cls = convertToClassEntity(classDto);
+            classService.addClass(cls);
+            return ResponseEntity.ok("Class added successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add class.");
+        }
+    }
 
-        // Lấy thông tin giáo viên và gán cho classDto
-        Teacher teacher = classEntity.getTeacher();
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateClass(@PathVariable Long id, @RequestBody ClassDto classDto) {
+        ClassEntity existingClass = classService.getClassById(id);
+        if (existingClass != null) {
+            ClassEntity updatedClass = convertToClassEntity(classDto);
+            updatedClass.setId(existingClass.getId());
+            classService.updateClass(updatedClass);
+            return ResponseEntity.ok("Class updated successfully!");
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    private ClassDto convertToClassDto(ClassEntity cls) {
+        ClassDto classDto = new ClassDto();
+        classDto.setId(cls.getId());
+        classDto.setName(cls.getClassName());
+        classDto.setDescription(cls.getClassDescription());
+
+        Teacher teacher = cls.getTeacher();
         if (teacher != null) {
-            TeacherDto teacherDto = convertToTeacherDto(teacher);
-            classDto.setTeacher(teacherDto);
+            classDto.setTeacherName(teacher.getName());
         }
 
         return classDto;
     }
 
+
     private ClassEntity convertToClassEntity(ClassDto classDto) {
-        ClassEntity classEntity = new ClassEntity();
-        classEntity.setClassName(classDto.getClassName());
-        classEntity.setClassDescription(classDto.getClassDescription());
-        return classEntity;
+        ClassEntity cls = new ClassEntity();
+        cls.setClassName(classDto.getName());
+        cls.setClassDescription(classDto.getDescription());
+
+        // Lấy giáo viên từ tên giáo viên trong classDto
+        String teacherName = classDto.getTeacherName();
+        if (teacherName != null && !teacherName.isEmpty()) {
+            Teacher teacher = teacherService.getTeacherByName(teacherName);
+            if (teacher != null) {
+                cls.setTeacher(teacher);
+            }
+        }
+
+        return cls;
     }
 
-    private TeacherDto convertToTeacherDto(Teacher teacher) {
-        TeacherDto teacherDto = new TeacherDto();
-        teacherDto.setId(teacher.getId());
-        teacherDto.setName(teacher.getName());
-        // Bổ sung các thuộc tính khác của giáo viên vào teacherDto (nếu có)
-        return teacherDto;
-    }
 }

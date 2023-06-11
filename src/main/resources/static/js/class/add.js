@@ -2,23 +2,27 @@ $(document).ready(function() {
   // Khởi tạo validator cho form
   $('#addClassForm').validate({
     rules: {
-      className: {
+      name: {
         required: true,
         maxlength: 50
       },
-      classDescription: {
-        required: true,
-        maxlength: 100
+      teacher: {
+        required: true
+      },
+      room: {
+        required: true
       }
     },
     messages: {
-      className: {
-        required: "Class Name is required",
-        maxlength: "Class Name must be less than 50 characters"
+      name: {
+        required: "Class name is required",
+        maxlength: "Class name must be less than 50 characters"
       },
-      classDescription: {
-        required: "Class Description is required",
-        maxlength: "Class Description must be less than 100 characters"
+      teacher: {
+        required: "Teacher name is required"
+      },
+      room: {
+        required: "Room number is required"
       }
     },
     errorPlacement: function (error, element) {
@@ -35,19 +39,20 @@ $(document).ready(function() {
       // Lấy thông tin lớp học từ form
       var className = $('#className').val();
       var classDescription = $('#classDescription').val();
-      var teacherId = $('#teacher').val(); // Lấy ID của giáo viên
+      var teacherName = $('#teacher').val();
 
       // Tạo đối tượng lớp học mới
       var newClass = {
-        className: className,
-        classDescription: classDescription,
-        teacher: { id: teacherId } // Thêm thông tin giáo viên vào đối tượng lớp học
+        name: className,
+        description: classDescription,
+        teacherName: teacherName
       };
 
       // Gửi yêu cầu POST để thêm lớp học
       $.ajax({
-        url: 'http://localhost:8080/api/v1/classes',
+        url: '/api/v1/classes',
         type: 'POST',
+        dataType: 'json',
         contentType: 'application/json',
         data: JSON.stringify(newClass),
         success: function() {

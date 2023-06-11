@@ -25,20 +25,21 @@
             <form id="addClassForm" th:action="@{/api/v1/classes}" method="post" th:object="${classDto}">
                 <div class="form-group">
                     <label for="className">Class Name:</label>
-                    <input type="text" class="form-control" id="className" th:field="*{className}" required>
-                    <p class="error-message" id="className-error"></p>
+                    <input type="text" class="form-control" id="className" th:field="*{name}" required>
+                    <p class="error-message"></p>
                 </div>
                 <div class="form-group">
                     <label for="classDescription">Class Description:</label>
-                    <textarea class="form-control" id="classDescription" th:field="*{classDescription}" required></textarea>
-                    <p class="error-message" id="classDescription-error"></p>
+                    <textarea class="form-control" id="classDescription" th:field="*{description}" required></textarea>
+                    <p class="error-message"></p>
                 </div>
                 <div class="form-group">
                     <label for="teacher">Teacher:</label>
-                    <select class="form-control" id="teacher" th:field="*{teacher.id}">
-                        <option value="">Choose a teacher</option>
-                        <option th:each="teacher : ${teachers}" th:value="${teacher.id}" th:text="${teacher.name}"></option>
+                    <select class="form-control" id="teacher" th:field="*{teacherName}">
+                        <option value="">Select a teacher</option> <!-- Thêm option mặc định -->
+                        <option th:each="teacher : ${teachers}" th:value="${teacher.name}" th:text="${teacher.name}" th:selected="${teacher.name == classDto.teacherName}"></option>
                     </select>
+                    <p class="error-message"></p>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Add</button>
             </form>

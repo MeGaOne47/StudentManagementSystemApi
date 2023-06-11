@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.dto.ClassDto;
 import com.example.demo.entity.ClassEntity;
 import com.example.demo.services.ClassService;
+import com.example.demo.services.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +19,8 @@ public class ClassController {
     @Autowired
     private ClassService classService;
 
+    @Autowired
+    private TeacherService teacherService;
     @GetMapping
     public String showAllClasses(Model model) {
         List<ClassEntity> classes = classService.getAllClasses();
@@ -28,8 +31,10 @@ public class ClassController {
     @GetMapping("/add")
     public String addClassForm(Model model) {
         model.addAttribute("classDto", new ClassDto());
+        model.addAttribute("teachers", teacherService.getAllTeachers()); // Thêm dữ liệu giáo viên
         return "class/add";
     }
+
 
     @PostMapping("/add")
     public String addClass(@Valid @ModelAttribute("classDto") ClassDto classDto, BindingResult result) {
@@ -50,6 +55,7 @@ public class ClassController {
         }
         ClassDto classDto = convertToClassDto(classEntity);
         model.addAttribute("classDto", classDto);
+        model.addAttribute("teachers", teacherService.getAllTeachers());
         return "class/edit";
     }
 
@@ -74,15 +80,15 @@ public class ClassController {
     private ClassDto convertToClassDto(ClassEntity classEntity) {
         ClassDto classDto = new ClassDto();
         classDto.setId(classEntity.getId());
-        classDto.setClassName(classEntity.getClassName());
-        classDto.setClassDescription(classEntity.getClassDescription());
+        classDto.setName(classEntity.getClassName());
+        classDto.setDescription(classEntity.getClassDescription());
         return classDto;
     }
 
     private ClassEntity convertToClassEntity(ClassDto classDto) {
         ClassEntity classEntity = new ClassEntity();
-        classEntity.setClassName(classDto.getClassName());
-        classEntity.setClassDescription(classDto.getClassDescription());
+        classEntity.setClassName(classDto.getName());
+        classEntity.setClassDescription(classDto.getDescription());
         return classEntity;
     }
 }

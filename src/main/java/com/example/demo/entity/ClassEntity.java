@@ -27,6 +27,17 @@ public class ClassEntity {
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
+    }
+
+    @Transient
+    private String teacherName;
+
     public ClassEntity() {
     }
 

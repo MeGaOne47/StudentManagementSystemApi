@@ -33,4 +33,8 @@ public class TeacherService {
     public void deleteTeacher(Long id) {
         teacherRepository.deleteById(id);
     }
+
+    public Teacher getTeacherByName(String name) {
+        return teacherRepository.findByName(name);
+    }
 }
