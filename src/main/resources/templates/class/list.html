@@ -5,15 +5,27 @@
     <title>My Class List</title>
     <th:block th:replace="layout :: Link-css"></th:block>
 </head>
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+
+        .table-heading {
+            background-color: #f8f9fa;
+        }
+    </style>
 <body>
 <th:block th:replace="layout :: header"></th:block>
 <div class="container">
-    <h1>My Class List</h1>
-    <div th:if="${successMessage}">
+    <h1 class="text-center">My Class List</h1>
+    <div th:if="${successMessage}" class="alert alert-success mt-4">
         <div class="alert alert-success" th:text="${successMessage}"></div>
     </div>
 
-    <table class="table">
+    <input type="text" id="searchInput" class="form-control-sm" placeholder="Search keyword...">
+
+    <table class="table mt-4">
+        <thead class="table-heading">
         <tr>
             <th>ID</th>
             <th>Class Name</th>
@@ -21,6 +33,7 @@
             <th>Class Teacher</th>
             <th sec:authorize="hasAnyAuthority('ADMIN')">Action</th>
         </tr>
+        </thead>
         <tbody id="class-table-body">
         </tbody>
     </table>

@@ -3,6 +3,8 @@ package com.example.demo.entity;
 import com.example.demo.Validator.anotation.ValidUserId;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "teachers")
 public class Teacher {

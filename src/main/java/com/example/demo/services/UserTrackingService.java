@@ -17,7 +17,7 @@ public class UserTrackingService {
         this.userTrackingRepository = userTrackingRepository;
     }
 
-    public void trackUserAccessedBooks(String username, String ipAddress, String pageUrl) {
+    public void trackUserAccessed(String username, String ipAddress, String pageUrl) {
         // Tạo đối tượng UserTracking từ thông tin người dùng
         UserTracking userTracking = new UserTracking(username, ipAddress, LocalDateTime.now(), pageUrl);
         // Lưu đối tượng UserTracking vào cơ sở dữ liệu

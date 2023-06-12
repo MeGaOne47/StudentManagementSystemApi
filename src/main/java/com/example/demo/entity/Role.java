@@ -25,10 +25,8 @@ public class Role{
         @Column(name = "description", length = 250)
         private String description;
 
-//        @ManyToMany(fetch = FetchType.EAGER)
-//        @JoinTable(name = "user_role",
-//                joinColumns = @JoinColumn(name = "user_id"),
-//                inverseJoinColumns = @JoinColumn(name = "role_id"))
-//        private Set<User> users = new HashSet<>();
+        @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
+        private Set<User> users = new HashSet<>();
+
 
 }

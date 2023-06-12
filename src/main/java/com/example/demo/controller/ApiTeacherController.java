@@ -97,4 +97,13 @@ public class ApiTeacherController {
         return ResponseEntity.notFound().build(); // Trả về mã phản hồi HTTP 404 nếu không tìm thấy giáo viên
     }
 
+    @GetMapping("/search")
+    public List<TeacherDto> searchTeachers(@RequestParam("keyword") String keyword) {
+        List<Teacher> teachers = teacherService.searchTeachers(keyword);
+        List<TeacherDto> teacherDTOs = new ArrayList<>();
+        for (Teacher teacher : teachers) {
+            teacherDTOs.add(convertToTeacherDto(teacher));
+        }
+        return teacherDTOs;
+    }
 }

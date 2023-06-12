@@ -4,7 +4,10 @@ import com.example.demo.dto.ClassDto;
 import com.example.demo.entity.ClassEntity;
 import com.example.demo.services.ClassService;
 import com.example.demo.services.TeacherService;
+import com.example.demo.services.UserTrackingService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,15 +24,35 @@ public class ClassController {
 
     @Autowired
     private TeacherService teacherService;
+
+    @Autowired
+    private UserTrackingService userTrackingService;
+
     @GetMapping
-    public String showAllClasses(Model model) {
+    public String showAllClasses(Model model, HttpServletRequest request, Authentication authentication) {
+
+        // Lấy thông tin người dùng và địa chỉ IP
+        String username = authentication.getName();
+        String ipAddress = request.getRemoteAddr();
+
+        // Lưu thông tin người dùng khi truy cập trang "Teachers"
+        userTrackingService.trackUserAccessed(username, ipAddress, "/classes");
+
         List<ClassEntity> classes = classService.getAllClasses();
         model.addAttribute("classes", classes);
         return "class/list";
     }
 
     @GetMapping("/add")
-    public String addClassForm(Model model) {
+    public String addClassForm(Model model, HttpServletRequest request, Authentication authentication) {
+
+        // Lấy thông tin người dùng và địa chỉ IP
+        String username = authentication.getName();
+        String ipAddress = request.getRemoteAddr();
+
+        // Lưu thông tin người dùng khi truy cập trang "Teachers"
+        userTrackingService.trackUserAccessed(username, ipAddress, "/classes/add");
+
         model.addAttribute("classDto", new ClassDto());
         model.addAttribute("teachers", teacherService.getAllTeachers()); // Thêm dữ liệu giáo viên
         return "class/add";
@@ -48,7 +71,15 @@ public class ClassController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editClassForm(@PathVariable("id") Long id, Model model) {
+    public String editClassForm(@PathVariable("id") Long id, Model model, HttpServletRequest request, Authentication authentication) {
+
+        // Lấy thông tin người dùng và địa chỉ IP
+        String username = authentication.getName();
+        String ipAddress = request.getRemoteAddr();
+
+        // Lưu thông tin người dùng khi truy cập trang "Teachers"
+        userTrackingService.trackUserAccessed(username, ipAddress, "/classes/edit");
+
         ClassEntity classEntity = classService.getClassById(id);
         if (classEntity == null) {
             return "redirect:/classes";

@@ -1,10 +1,14 @@
 package com.example.demo.dto;
 
+import java.util.List;
+
 public class TeacherDto {
     private Long id;
     private String name;
     private String age;
     private String courseName;
+
+
 
     // Constructors, getters, and setters
 

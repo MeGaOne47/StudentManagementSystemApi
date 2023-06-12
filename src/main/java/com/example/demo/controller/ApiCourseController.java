@@ -1,13 +1,16 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.CourseDto;
+import com.example.demo.dto.StudentDto;
 import com.example.demo.entity.Course;
+import com.example.demo.entity.Student;
 import com.example.demo.services.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,5 +84,15 @@ public class ApiCourseController {
         course.setName(courseDto.getName());
         course.setDescription(courseDto.getDescription()); // Thêm trường 'description'
         return course;
+    }
+
+    @GetMapping("/search")
+    public List<CourseDto> searchCourses(@RequestParam("keyword") String keyword) {
+        List<Course> courses = courseService.searchCourses(keyword);
+        List<CourseDto> courseDTOs = new ArrayList<>();
+        for (Course course : courses) {
+            courseDTOs.add(convertToCourseDto(course));
+        }
+        return courseDTOs;
     }
 }

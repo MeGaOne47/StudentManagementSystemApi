@@ -7,7 +7,11 @@ import com.example.demo.repository.ITeacherRepository;
 import com.example.demo.services.CourseService;
 import com.example.demo.services.TeacherService;
 import javax.validation.Valid;
+
+import com.example.demo.services.UserTrackingService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,20 +31,39 @@ public class TeacherController {
     private CourseService courseService;
 
     @Autowired
+    private UserTrackingService userTrackingService;
+
+    @Autowired
     private ITeacherRepository teacherRepository;
 
     @Autowired
     private ICourseRepository courseRepository;
 
     @GetMapping
-    public String showAllTeachers(Model model) {
+    public String showAllTeachers(Model model, HttpServletRequest request, Authentication authentication) {
+
+        // Lấy thông tin người dùng và địa chỉ IP
+        String username = authentication.getName();
+        String ipAddress = request.getRemoteAddr();
+
+        // Lưu thông tin người dùng khi truy cập trang "Teachers"
+        userTrackingService.trackUserAccessed(username, ipAddress, "/teachers");
+
         List<Teacher> teachers = teacherService.getAllTeachers();
         model.addAttribute("teachers", teachers);
         return "teacher/list";
     }
 
     @GetMapping("/add")
-    public String addTeacherForm(Model model) {
+    public String addTeacherForm(Model model, HttpServletRequest request, Authentication authentication) {
+
+        // Lấy thông tin người dùng và địa chỉ IP
+        String username = authentication.getName();
+        String ipAddress = request.getRemoteAddr();
+
+        // Lưu thông tin người dùng khi truy cập trang "Teachers"
+        userTrackingService.trackUserAccessed(username, ipAddress, "/teachers/add");
+
         model.addAttribute("teacher", new Teacher());
         model.addAttribute("courses", courseService.getAllCourses());
         return "teacher/add";
@@ -70,7 +93,15 @@ public class TeacherController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editTeacher(@PathVariable("id") Long id, Model model) {
+    public String editTeacher(@PathVariable("id") Long id, Model model, HttpServletRequest request, Authentication authentication) {
+
+        // Lấy thông tin người dùng và địa chỉ IP
+        String username = authentication.getName();
+        String ipAddress = request.getRemoteAddr();
+
+        // Lưu thông tin người dùng khi truy cập trang "Teachers"
+        userTrackingService.trackUserAccessed(username, ipAddress, "/teachers/edit");
+
         Optional<Teacher> optionalTeacher = teacherRepository.findById(id);
         if (!optionalTeacher.isPresent()) {
             return "teacher/list";

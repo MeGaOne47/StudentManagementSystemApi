@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.ClassDto;
+import com.example.demo.dto.CourseDto;
 import com.example.demo.entity.ClassEntity;
+import com.example.demo.entity.Course;
 import com.example.demo.entity.Teacher;
 import com.example.demo.services.ClassService;
 import com.example.demo.services.TeacherService;
@@ -108,5 +110,13 @@ public class ApiClassController {
 
         return cls;
     }
-
+    @GetMapping("/search")
+    public List<ClassDto> searchClasses(@RequestParam("keyword") String keyword) {
+        List<ClassEntity> classes = classService.searchClasses(keyword);
+        List<ClassDto> classDTOs = new ArrayList<>();
+        for (ClassEntity classEntity : classes) {
+            classDTOs.add(convertToClassDto(classEntity));
+        }
+        return classDTOs;
+    }
 }

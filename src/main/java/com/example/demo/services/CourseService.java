@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import com.example.demo.entity.Course;
+import com.example.demo.entity.Student;
 import com.example.demo.repository.ICourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,11 @@ public class CourseService {
 
     public Course getCourseByName(String name) {
         return courseRepository.findByName(name);
+    }
+
+    public List<Course> searchCourses(String keyword) {
+        String searchKeyword = "%" + keyword.toLowerCase() + "%";
+        return courseRepository.searchByName(searchKeyword);
     }
 }
 

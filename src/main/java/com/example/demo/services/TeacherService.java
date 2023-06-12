@@ -37,4 +37,10 @@ public class TeacherService {
     public Teacher getTeacherByName(String name) {
         return teacherRepository.findByName(name);
     }
+
+
+    public List<Teacher> searchTeachers(String keyword) {
+        String searchKeyword = "%" + keyword.toLowerCase() + "%";
+        return teacherRepository.searchByNameOrCourseName(searchKeyword);
+    }
 }

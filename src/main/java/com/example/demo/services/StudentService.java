@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import com.example.demo.entity.Student;
+import com.example.demo.entity.Teacher;
 import com.example.demo.repository.IStudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,5 +33,10 @@ public class StudentService {
 
     public void deleteStudent(Long id) {
         studentRepository.deleteById(id);
+    }
+
+    public List<Student> searchStudents(String keyword) {
+        String searchKeyword = "%" + keyword.toLowerCase() + "%";
+        return studentRepository.searchByNameOrCourseName(searchKeyword);
     }
 }

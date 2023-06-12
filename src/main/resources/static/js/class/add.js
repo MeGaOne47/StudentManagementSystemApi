@@ -3,26 +3,24 @@ $(document).ready(function() {
   $('#addClassForm').validate({
     rules: {
       name: {
-        required: true,
-        maxlength: 50
-      },
-      teacher: {
         required: true
       },
-      room: {
+      description: {
+        required: true
+      },
+      teacherName: {
         required: true
       }
     },
     messages: {
       name: {
-        required: "Class name is required",
-        maxlength: "Class name must be less than 50 characters"
+        required: "Please enter the class name."
       },
-      teacher: {
-        required: "Teacher name is required"
+      description: {
+        required: "Please enter the class description."
       },
-      room: {
-        required: "Room number is required"
+      teacherName: {
+        required: "Please select a teacher."
       }
     },
     errorPlacement: function (error, element) {

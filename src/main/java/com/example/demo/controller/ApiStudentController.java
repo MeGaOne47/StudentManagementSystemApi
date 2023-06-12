@@ -1,8 +1,10 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.StudentDto;
+import com.example.demo.dto.TeacherDto;
 import com.example.demo.entity.Course;
 import com.example.demo.entity.Student;
+import com.example.demo.entity.Teacher;
 import com.example.demo.services.CourseService;
 import com.example.demo.services.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,5 +98,16 @@ public class ApiStudentController {
         }
         return ResponseEntity.notFound().build(); // Trả về mã phản hồi HTTP 404 nếu không tìm thấy học viên
     }
+
+    @GetMapping("/search")
+    public List<StudentDto> searchStudents(@RequestParam("keyword") String keyword) {
+        List<Student> students = studentService.searchStudents(keyword);
+        List<StudentDto> studentDTOs = new ArrayList<>();
+        for (Student student : students) {
+            studentDTOs.add(convertToStudentDto(student));
+        }
+        return studentDTOs;
+    }
+
 
 }

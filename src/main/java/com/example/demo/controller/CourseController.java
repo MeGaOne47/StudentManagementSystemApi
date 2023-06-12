@@ -3,7 +3,10 @@ package com.example.demo.controller;
 import com.example.demo.entity.Course;
 import com.example.demo.repository.ICourseRepository;
 import com.example.demo.services.CourseService;
+import com.example.demo.services.UserTrackingService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,17 +23,36 @@ public class CourseController {
     private CourseService courseService;
 
     @Autowired
+    private UserTrackingService userTrackingService;
+
+    @Autowired
     private ICourseRepository courseRepository;
 
     @GetMapping
-    public String showAllCourses(Model model) {
+    public String showAllCourses(Model model, HttpServletRequest request, Authentication authentication) {
+
+        // Lấy thông tin người dùng và địa chỉ IP
+        String username = authentication.getName();
+        String ipAddress = request.getRemoteAddr();
+
+        // Lưu thông tin người dùng khi truy cập trang "Teachers"
+        userTrackingService.trackUserAccessed(username, ipAddress, "/courses");
+
         List<Course> courses = courseService.getAllCourses();
         model.addAttribute("courses", courses);
         return "course/list";
     }
 
     @GetMapping("/add")
-    public String addCourseForm(Model model) {
+    public String addCourseForm(Model model, HttpServletRequest request, Authentication authentication) {
+
+        // Lấy thông tin người dùng và địa chỉ IP
+        String username = authentication.getName();
+        String ipAddress = request.getRemoteAddr();
+
+        // Lưu thông tin người dùng khi truy cập trang "Teachers"
+        userTrackingService.trackUserAccessed(username, ipAddress, "/courses/add");
+
         model.addAttribute("course", new Course());
         return "course/add";
     }
@@ -59,7 +81,15 @@ public class CourseController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editCourse(@PathVariable("id") Long id, Model model) {
+    public String editCourse(@PathVariable("id") Long id, Model model, HttpServletRequest request, Authentication authentication) {
+
+        // Lấy thông tin người dùng và địa chỉ IP
+        String username = authentication.getName();
+        String ipAddress = request.getRemoteAddr();
+
+        // Lưu thông tin người dùng khi truy cập trang "Teachers"
+        userTrackingService.trackUserAccessed(username, ipAddress, "/courses/edit");
+
         Optional<Course> optionalCourse = courseRepository.findById(id);
         if (!optionalCourse.isPresent()) {
             return "course/list";

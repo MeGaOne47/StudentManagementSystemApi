@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import com.example.demo.entity.ClassEntity;
+import com.example.demo.entity.Student;
 import com.example.demo.repository.IClassRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,5 +37,10 @@ public class ClassService {
 
     public ClassEntity getClassByName(String className) {
         return classRepository.findByClassName(className);
+    }
+
+    public List<ClassEntity> searchClasses(String keyword) {
+        String searchKeyword = "%" + keyword.toLowerCase() + "%";
+        return classRepository.searchByNameOrTeacherName(searchKeyword);
     }
 }

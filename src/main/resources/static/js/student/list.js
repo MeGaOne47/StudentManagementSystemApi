@@ -1,72 +1,105 @@
 $(document).ready(function () {
-  $.ajax({
-    url: 'http://localhost:8080/api/v1/students',
-    type: 'GET',
-    dataType: 'json',
-    success: function (data) {
-      let trHTML = '';
-      $.each(data, function (i, item) {
-        trHTML += '<tr id="student-' + item.id + '">' +
-          '<td>' + item.id + '</td>' +
-          '<td>' + item.name + '</td>' +
-          '<td>' + item.age + '</td>' +
-          '<td>' + item.courseName + '</td>' +
-          '<td>';
+  loadStudents();
 
-        if (hasAdminAuthority()) {
-          trHTML += '<a href="/students/edit/' + item.id + '" class="text-primary edit-link" data-id="' + item.id + '">Edit</a> | ';
-          trHTML += '<a href="/students/' + item.id + '" class="text-danger" onclick="apiDeleteStudent(' + item.id + '); return false;">Delete</a>';
-        }
-
-        trHTML += '</td>' +
-          '</tr>';
-      });
-      $('#student-table-body').append(trHTML);
-
-      // Sửa học viên - Xử lý sự kiện khi nhấp vào liên kết "Edit"
-      $('.edit-link').click(function (e) {
-        e.preventDefault();
-        var studentId = $(this).data('id');
-        editStudent(studentId);
-      });
-    }
+  $('#searchInput').on('input', function () {
+    var keyword = $(this).val();
+    searchStudents(keyword);
   });
-});
 
-function hasAdminAuthority() {
-  // Thực hiện kiểm tra quyền truy cập của người dùng
-  // Ví dụ: Kiểm tra xem người dùng có quyền admin hay không
-  var isAdmin = false;
-
-  // Thực hiện logic kiểm tra quyền truy cập thực tế
-  // Ví dụ: Kiểm tra thông qua dữ liệu người dùng hiện tại hoặc thông qua một yêu cầu AJAX khác
-
-  // Ví dụ: Nếu người dùng có quyền admin, gán biến isAdmin = true
-  if (currentUser && currentUser.authorities && currentUser.authorities.length > 0) {
-    for (var i = 0; i < currentUser.authorities.length; i++) {
-      if (currentUser.authorities[i].authority === 'ADMIN') {
-        isAdmin = true;
-        break;
-      }
-    }
-  }
-
-  return isAdmin;
-}
-
-function editStudent(studentId) {
-  window.location.href = '/students/edit/' + studentId;
-}
-
-function apiDeleteStudent(id) {
-  if (confirm('Are you sure you want to delete this student?')) {
+  function loadStudents() {
     $.ajax({
-      url: 'http://localhost:8080/api/v1/students/' + id,
-      type: 'DELETE',
-      success: function () {
-        alert('Student deleted successfully!');
-        $('#student-' + id).remove();
+      url: 'http://localhost:8080/api/v1/students',
+      type: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        displayStudents(data);
       }
     });
   }
-}
+
+  function searchStudents(keyword) {
+    $.ajax({
+      url: 'http://localhost:8080/api/v1/students/search',
+      type: 'GET',
+      data: { keyword: keyword },
+      dataType: 'json',
+      success: function (data) {
+        displayStudents(data);
+      }
+    });
+  }
+
+  function displayStudents(students) {
+    var tbody = $('#student-table-body');
+    tbody.empty();
+
+    if (students.length === 0) {
+      var noDataMessage = $('<tr>').append($('<td colspan="5">').text('No students found.'));
+      tbody.append(noDataMessage);
+      return;
+    }
+
+    $.each(students, function (i, student) {
+      var row = $('<tr>').attr('id', 'student-' + student.id);
+
+      $('<td>').text(student.id).appendTo(row);
+      $('<td>').text(student.name).appendTo(row);
+      $('<td>').text(student.age).appendTo(row);
+      $('<td>').text(student.courseName).appendTo(row);
+
+      if (hasAdminAuthority()) {
+        var editLink = $('<a>').attr({
+          href: '/students/edit/' + student.id,
+          class: 'btn btn-primary edit-link',
+          'data-id': student.id
+        }).text('Edit');
+
+        var deleteButton = $('<button>').addClass('btn btn-danger delete-link').text('Delete')
+          .click(function () {
+            deleteStudent(student.id);
+          });
+
+        $('<td>').append(editLink, ' ', deleteButton).appendTo(row);
+      }
+
+      tbody.append(row);
+    });
+
+    // Sửa học viên - Xử lý sự kiện khi nhấp vào nút "Edit"
+    $('.edit-link').click(function (e) {
+      e.preventDefault();
+      var studentId = $(this).data('id');
+      editStudent(studentId);
+    });
+  }
+
+  function hasAdminAuthority() {
+    // Kiểm tra xem authorities có tồn tại và có quyền ADMIN hay không
+    if (currentUser && currentUser.authorities && currentUser.authorities.length > 0) {
+      for (var i = 0; i < currentUser.authorities.length; i++) {
+        if (currentUser.authorities[i].authority === 'ADMIN') {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  function editStudent(studentId) {
+    window.location.href = '/students/edit/' + studentId;
+  }
+
+  function deleteStudent(id) {
+    if (confirm('Are you sure you want to delete this student?')) {
+      $.ajax({
+        url: 'http://localhost:8080/api/v1/students/' + id,
+        type: 'DELETE',
+        success: function () {
+          alert('Student deleted successfully!');
+          $('#student-' + id).remove();
+        }
+      });
+    }
+  }
+});

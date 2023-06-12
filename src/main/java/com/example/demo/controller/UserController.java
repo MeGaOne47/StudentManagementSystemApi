@@ -84,49 +84,4 @@ public class UserController {
         return "user/listUser";
     }
 
-
-//    @GetMapping("/users/{userId}/edit")
-//    public String editUser(@PathVariable Long userId, Model model) {
-//        User user = userService.findUserById(userId);
-//        List<Role> allRoles = userService.getAllRoles();
-//
-//        model.addAttribute("user", user);
-//        model.addAttribute("allRoles", allRoles);
-//
-//        return "user/editUser";
-//    }
-
-//    @PostMapping("/users/{userId}/update")
-//    public String updateUser(
-//            @PathVariable Long userId,
-//            @ModelAttribute("user") User updatedUser,
-//            BindingResult bindingResult,
-//            Model model) {
-//
-//        if (bindingResult.hasErrors()) {
-//            // Xử lý lỗi nếu có
-//            return "user/editUser";
-//        }
-//
-//        // Tìm người dùng cần sửa thông tin
-//        User existingUser = userService.findUserById(userId);
-//        if (existingUser == null) {
-//            // Xử lý trường hợp không tìm thấy người dùng
-//            return "error";
-//        }
-//
-//        // Cập nhật thông tin người dùng
-//        existingUser.setName(updatedUser.getName());
-//        existingUser.setEmail(updatedUser.getEmail());
-//
-//        // Cập nhật quyền của người dùng
-//        Set<Role> updatedRoles = updatedUser.getRoles();
-//        existingUser.setRoles(updatedRoles);
-//
-//        // Lưu lại các thay đổi vào cơ sở dữ liệu
-//        userService.save(existingUser);
-//
-//        return "redirect:/users";
-//    }
-
 }
