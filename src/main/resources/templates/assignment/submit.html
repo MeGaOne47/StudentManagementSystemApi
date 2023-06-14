@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit Assignment</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<th:block th:replace="layout :: header"></th:block>
+<div class="container">
+    <h1>Submit Assignment</h1>
+    <form th:action="@{/assignments/submit/{id}(id=${assignment.id})}" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Select File:</label>
+            <input type="file" class="form-control-file" id="file" name="file" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <a class="btn btn-primary" th:href="@{/assignments}">Back to List</a>
+</div>
+<th:block th:replace="layout :: footer"></th:block>
+</body>
+</html>

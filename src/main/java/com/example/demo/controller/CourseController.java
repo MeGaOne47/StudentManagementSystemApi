@@ -1,9 +1,9 @@
 package com.example.demo.controller;
 
+import com.example.demo.entity.Assignment;
 import com.example.demo.entity.Course;
+import com.example.demo.repository.IAssignmentRepository;
 import com.example.demo.repository.ICourseRepository;
-import com.example.demo.services.CourseService;
-import com.example.demo.services.UserTrackingService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -20,79 +20,53 @@ import java.util.Optional;
 @RequestMapping("/courses")
 public class CourseController {
     @Autowired
-    private CourseService courseService;
-
-    @Autowired
-    private UserTrackingService userTrackingService;
-
-    @Autowired
     private ICourseRepository courseRepository;
 
+    @Autowired
+    private IAssignmentRepository assignmentRepository;
+
     @GetMapping
-    public String showAllCourses(Model model, HttpServletRequest request, Authentication authentication) {
-
-        // Lấy thông tin người dùng và địa chỉ IP
-        String username = authentication.getName();
-        String ipAddress = request.getRemoteAddr();
-
-        // Lưu thông tin người dùng khi truy cập trang "Teachers"
-        userTrackingService.trackUserAccessed(username, ipAddress, "/courses");
-
-        List<Course> courses = courseService.getAllCourses();
+    public String showAllCourses(Model model) {
+        List<Course> courses = courseRepository.findAll();
         model.addAttribute("courses", courses);
         return "course/list";
     }
 
     @GetMapping("/add")
-    public String addCourseForm(Model model, HttpServletRequest request, Authentication authentication) {
-
-        // Lấy thông tin người dùng và địa chỉ IP
-        String username = authentication.getName();
-        String ipAddress = request.getRemoteAddr();
-
-        // Lưu thông tin người dùng khi truy cập trang "Teachers"
-        userTrackingService.trackUserAccessed(username, ipAddress, "/courses/add");
-
+    public String addCourseForm(Model model) {
         model.addAttribute("course", new Course());
         return "course/add";
     }
 
     @PostMapping("/add")
-    public String addCourse( @ModelAttribute("course") Course course, BindingResult result, RedirectAttributes redirectAttributes) {
+    public String addCourse(@ModelAttribute("course") Course course, BindingResult result, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             // Xử lý lỗi hợp lệ
             return "/course/add";
         }
-        courseService.addCourse(course);
+        courseRepository.save(course);
         redirectAttributes.addFlashAttribute("successMessage", "Thêm khóa học thành công!");
         return "redirect:/courses";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteCourse(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
-        Course course = courseService.getCourseById(id);
-        if (course == null) {
-            model.addAttribute("errorMessage", "Khóa học không tồn tại");
-            return "/course/list";
+    public String deleteCourse(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        Optional<Course> optionalCourse = courseRepository.findById(id);
+        if (!optionalCourse.isPresent()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Khóa học không tồn tại");
+            return "redirect:/courses";
         }
-        courseService.deleteCourse(id);
+        Course course = optionalCourse.get();
+        courseRepository.delete(course);
         redirectAttributes.addFlashAttribute("successMessage", "Xóa khóa học thành công!");
         return "redirect:/courses";
     }
 
     @GetMapping("/edit/{id}")
-    public String editCourse(@PathVariable("id") Long id, Model model, HttpServletRequest request, Authentication authentication) {
-
-        // Lấy thông tin người dùng và địa chỉ IP
-        String username = authentication.getName();
-        String ipAddress = request.getRemoteAddr();
-
-        // Lưu thông tin người dùng khi truy cập trang "Teachers"
-        userTrackingService.trackUserAccessed(username, ipAddress, "/courses/edit");
-
+    public String editCourse(@PathVariable("id") Long id, Model model) {
         Optional<Course> optionalCourse = courseRepository.findById(id);
         if (!optionalCourse.isPresent()) {
-            return "course/list";
+            return "redirect:/courses";
         }
         Course course = optionalCourse.get();
         model.addAttribute("course", course);
@@ -103,13 +77,75 @@ public class CourseController {
     public String updateCourse(@PathVariable("id") Long id, @ModelAttribute("course") Course course, RedirectAttributes redirectAttributes) {
         Optional<Course> optionalCourse = courseRepository.findById(id);
         if (!optionalCourse.isPresent()) {
-            return "redirect:/course/list";
+            return "redirect:/courses";
         }
         Course existingCourse = optionalCourse.get();
         existingCourse.setName(course.getName());
-//        existingCourse.setDescription(course.getDescription());
         courseRepository.save(existingCourse);
         redirectAttributes.addFlashAttribute("successMessage", "Cập nhật khóa học thành công!");
         return "redirect:/courses";
+    }
+
+    @GetMapping("/{courseId}/assignments")
+    public String showCourseAssignments(@PathVariable("courseId") Long courseId, Model model) {
+        Optional<Course> optionalCourse = courseRepository.findById(courseId);
+        if (!optionalCourse.isPresent()) {
+            return "redirect:/courses";
+        }
+        Course course = optionalCourse.get();
+        model.addAttribute("course", course);
+        return "course/assignments";
+    }
+
+    @GetMapping("/{courseId}/assignments/add")
+    public String addAssignmentForm(@PathVariable("courseId") Long courseId, Model model) {
+        Optional<Course> optionalCourse = courseRepository.findById(courseId);
+        if (!optionalCourse.isPresent()) {
+            return "redirect:/courses";
+        }
+        Course course = optionalCourse.get();
+        model.addAttribute("course", course);
+        model.addAttribute("assignment", new Assignment());
+        return "course/add-assignment";
+    }
+
+    @PostMapping("/{courseId}/assignments/add")
+    public String addAssignment(
+            @PathVariable("courseId") Long courseId,
+            @ModelAttribute("assignment") Assignment assignment,
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            // Xử lý lỗi hợp lệ
+            return "/course/add-assignment";
+        }
+        Optional<Course> optionalCourse = courseRepository.findById(courseId);
+        if (!optionalCourse.isPresent()) {
+            return "redirect:/courses";
+        }
+        Course course = optionalCourse.get();
+        assignment.setCourse(course);
+        assignmentRepository.save(assignment);
+        redirectAttributes.addFlashAttribute("successMessage", "Thêm bài tập thành công!");
+        return "redirect:/courses/" + courseId + "/assignments";
+    }
+
+    @GetMapping("/{courseId}/assignments/delete/{assignmentId}")
+    public String deleteAssignment(
+            @PathVariable("courseId") Long courseId,
+            @PathVariable("assignmentId") Long assignmentId,
+            RedirectAttributes redirectAttributes) {
+        Optional<Course> optionalCourse = courseRepository.findById(courseId);
+        if (!optionalCourse.isPresent()) {
+            return "redirect:/courses";
+        }
+        Optional<Assignment> optionalAssignment = assignmentRepository.findById(assignmentId);
+        if (!optionalAssignment.isPresent()) {
+            return "redirect:/courses/" + courseId + "/assignments";
+        }
+        Assignment assignment = optionalAssignment.get();
+        assignmentRepository.delete(assignment);
+        redirectAttributes.addFlashAttribute("successMessage", "Xóa bài tập thành công!");
+        return "redirect:/courses/" + courseId + "/assignments";
     }
 }

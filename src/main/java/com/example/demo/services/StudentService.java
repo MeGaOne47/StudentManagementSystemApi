@@ -39,4 +39,5 @@ public class StudentService {
         String searchKeyword = "%" + keyword.toLowerCase() + "%";
         return studentRepository.searchByNameOrCourseName(searchKeyword);
     }
+
 }

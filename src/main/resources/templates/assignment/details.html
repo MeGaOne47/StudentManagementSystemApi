@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.springframework.org/schema/security">
+<head>
+  <meta charset="UTF-8">
+  <title>Assignment Details</title>
+  <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+        body {
+            padding-top: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        .btn {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+  <h1>Assignment Details</h1>
+  <div>
+    <h2>Title: <span th:text="${assignment.title}"></span></h2>
+    <p>Description: <span th:text="${assignment.description}"></span></p>
+    <!-- Display other details as needed -->
+  </div>
+
+  <!-- Display submit button if assignment is assigned -->
+  <a class="btn btn-primary" th:if="${assignment.assigned && assignment.status != 'Submitted'}"
+     th:href="@{/assignments/submit/{id}(id=${assignment.id})}">Submit Assignment</a>
+
+  <!-- Display submitted file if assignment is submitted -->
+  <div th:if="${assignment.status == 'Submitted'}">
+    <p>Submitted File: <a th:href="@{/assignments/download/{id}(id=${assignment.id})}">
+      <span th:text="${assignment.submittedFile}"></span>
+    </a></p>
+  </div>
+
+  <div th:if="${assignment.status == 'Submitted'}">
+    <p>Submitted File: <a th:href="@{/assignments/download/{id}(id=${assignment.id})}">
+      <span th:text="${assignment.submittedFile}"></span>
+    </a></p>
+
+    <h3>Submitted File Content:</h3>
+    <pre th:text="${fileContent}"></pre>
+  </div>
+
+
+  <!-- Thêm phần chấm điểm -->
+  <form sec:authorize="hasAnyAuthority('ADMIN', 'USER')" th:action="@{/assignments/grade/{id}(id=${assignment.id})}" method="post">
+    <div class="form-group">
+      <label for="score">Score:</label>
+      <input type="number" id="score" name="score" required class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Grade</button>
+  </form>
+
+  <!-- Thêm phần gia hạn nộp bài -->
+  <form sec:authorize="hasAnyAuthority('ADMIN', 'USER')" th:action="@{/assignments/extend/{id}(id=${assignment.id})}" method="post">
+    <div class="form-group">
+      <label for="deadline">New Deadline:</label>
+      <input type="date" id="deadline" name="deadline" required class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Extend Deadline</button>
+  </form>
+
+  <a class="btn btn-primary" th:href="@{/assignments}">Back to List</a>
+</div>
+<th:block th:replace="layout :: footer"></th:block>
+</body>
+</html>

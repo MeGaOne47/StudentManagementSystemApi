@@ -25,6 +25,9 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<Teacher> teachers;
 
+    @OneToMany(mappedBy = "course")
+    private List<Assignment> assignments;
+
     @Override
     public String toString() {
         return name;

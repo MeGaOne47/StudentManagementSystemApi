@@ -4,6 +4,8 @@ public class CourseDto {
     private Long id;
     private String name;
     private String description;
+
+    private String email;
     // Constructors, getters, and setters
 
     public String getDescription() {

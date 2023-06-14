@@ -16,13 +16,9 @@ public class Student {
     private Long id;
 
     @Column(name = "name")
-//    @NotEmpty(message = "Name must not be empty")
-//    @Size(max = 50, min = 1, message = "Name must be less than 50 characters")
     private String name;
 
     @Column(name = "age")
-//    @NotNull(message = "Age is required")
-//    @Min(value = 18, message = "Age must be greater than or equal to 18")
     private Integer age;
 
     public Long getId() {

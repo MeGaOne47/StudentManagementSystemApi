@@ -5,7 +5,7 @@ public class StudentDto {
     private String name;
     private String age;
     private String courseName;
-
+    private String email;
     public void setId(Long id) {
         this.id = id;
     }

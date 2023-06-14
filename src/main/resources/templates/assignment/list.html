@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.springframework.org/schema/security">
+<head>
+    <meta charset="UTF-8">
+    <title>Assignment List</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function deleteAssignment(assignmentId) {
+            var deleteUrl = "/assignments/delete/" + assignmentId;
+            $.ajax({
+                url: deleteUrl,
+                type: "DELETE",
+                success: function () {
+                    // Xóa thành công
+                    console.log('Assignment deleted');
+                    // Thực hiện các hành động bổ sung sau khi xóa, nếu cần
+
+                    // Cập nhật giao diện (xóa hàng dòng trong bảng)
+                    $('[data-assignment-id="' + assignmentId + '"]').closest('tr').remove();
+                },
+                error: function () {
+                    // Xóa thất bại hoặc không tìm thấy assignment
+                    console.log('Failed to delete assignment');
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+<th:block th:replace="layout :: header"></th:block>
+<div class="container">
+    <h1>Assignment List</h1>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Student Name</th>
+            <th>Score</th>
+            <th>Deadline</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="assignment : ${assignments}">
+            <td th:text="${assignment.title}"></td>
+            <td th:text="${assignment.description}"></td>
+            <td>
+                <span th:text="${assignment.student?.name}"></span>
+            </td>
+            <td>
+                <span th:text="${assignment.score}"></span>
+            </td>
+            <td>
+                <span th:text="${assignment.deadline}"></span>
+            </td>
+            <td>
+                <span th:if="${assignment.assigned}">Assigned</span>
+                <span th:if="${not assignment.assigned}">Not Assigned</span>
+            </td>
+            <td>
+                <a class="btn btn-primary" th:href="@{/assignments/{id}(id=${assignment.id})}">Details</a>
+                <a class="btn btn-warning" sec:authorize="hasAnyAuthority('ADMIN', 'USER')" th:href="@{/assignments/edit/{id}(id=${assignment.id})}">Edit</a>
+                <a class="btn btn-danger" sec:authorize="hasAnyAuthority('ADMIN', 'USER')" th:data-assignment-id="${assignment.id}" onclick="deleteAssignment(this.getAttribute('data-assignment-id'))">Delete</a>
+                <a class="btn btn-success" sec:authorize="hasAnyAuthority('ADMIN', 'USER')" th:if="${!assignment.assigned}" th:href="@{/assignments/assign/{id}(id=${assignment.id})}">Assign</a>
+            </td>
+        </tr>
+<!--        <tr th:each="assignment : ${assignments}">-->
+<!--            &lt;!&ndash; ... &ndash;&gt;-->
+<!--            <td>-->
+<!--                <span th:each="comment : ${assignment.comments}" th:text="${comment.content}"></span>-->
+<!--            </td>-->
+<!--            &lt;!&ndash; ... &ndash;&gt;-->
+<!--        </tr>-->
+        </tbody>
+    </table>
+<!--    <form th:action="@{/assignments/{assignmentId}/comments/add(assignmentId=${assignment?.id})}" method="post">-->
+<!--    <div class="input-group mb-3">-->
+<!--            <input type="text" class="form-control" placeholder="Add a comment" name="commentContent">-->
+<!--            <div class="input-group-append">-->
+<!--                <button class="btn btn-outline-primary" type="submit">Submit</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </form>-->
+    <a class="btn btn-success" sec:authorize="hasAnyAuthority('ADMIN', 'USER')" th:href="@{/assignments/add}">Add Assignment</a>
+</div>
+<th:block th:replace="layout :: footer"></th:block>
+</body>
+</html>
