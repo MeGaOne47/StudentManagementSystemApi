@@ -34,7 +34,7 @@
   </div>
 
   <!-- Display submit button if assignment is assigned -->
-  <a class="btn btn-primary" th:if="${assignment.assigned && assignment.status != 'Submitted'}"
+  <a sec:authorize="hasAnyAuthority('USER_ST')"  class="btn btn-primary" th:if="${assignment.assigned && assignment.status != 'Submitted'}"
      th:href="@{/assignments/submit/{id}(id=${assignment.id})}">Submit Assignment</a>
 
   <!-- Display submitted file if assignment is submitted -->

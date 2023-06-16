@@ -6,6 +6,14 @@
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        $(document).ready(function() {
+            $('#comment-list').hide(); // Ẩn ban đầu
+
+            $('#show-comments-btn').click(function() {
+                $('#comment-list').toggle(); // Hiển thị/ẩn khi nhấn kích hoạt
+            });
+        });
+
         function deleteAssignment(assignmentId) {
             var deleteUrl = "/assignments/delete/" + assignmentId;
             $.ajax({
@@ -26,6 +34,13 @@
             });
         }
     </script>
+    <style>
+        .comment-item {
+            margin-bottom: 10px; /* Khoảng cách dưới giữa các phần tử comment */
+            padding: 10px; /* Khoảng cách bên trong phần tử comment */
+            border: 1px solid #ccc; /* Viền cho phần tử comment */
+        }
+    </style>
 </head>
 <body>
 <th:block th:replace="layout :: header"></th:block>
@@ -67,24 +82,42 @@
                 <a class="btn btn-success" sec:authorize="hasAnyAuthority('ADMIN', 'USER')" th:if="${!assignment.assigned}" th:href="@{/assignments/assign/{id}(id=${assignment.id})}">Assign</a>
             </td>
         </tr>
-<!--        <tr th:each="assignment : ${assignments}">-->
-<!--            &lt;!&ndash; ... &ndash;&gt;-->
-<!--            <td>-->
-<!--                <span th:each="comment : ${assignment.comments}" th:text="${comment.content}"></span>-->
-<!--            </td>-->
-<!--            &lt;!&ndash; ... &ndash;&gt;-->
-<!--        </tr>-->
         </tbody>
     </table>
-<!--    <form th:action="@{/assignments/{assignmentId}/comments/add(assignmentId=${assignment?.id})}" method="post">-->
-<!--    <div class="input-group mb-3">-->
-<!--            <input type="text" class="form-control" placeholder="Add a comment" name="commentContent">-->
-<!--            <div class="input-group-append">-->
-<!--                <button class="btn btn-outline-primary" type="submit">Submit</button>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </form>-->
-    <a class="btn btn-success" sec:authorize="hasAnyAuthority('ADMIN', 'USER')" th:href="@{/assignments/add}">Add Assignment</a>
+    <h2>Comments</h2>
+    <div class="card">
+        <div class="card-body">
+            <form th:action="@{/comments}" method="post">
+                <div class="form-group">
+                    <textarea class="form-control" name="content" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Comment</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="comment-list" class="mt-3">
+        <h3>List of Comments:</h3>
+        <ul>
+            <li th:each="comment : ${comments}">
+                <div class="comment-item">
+                    <span>Content :<span th:text="${comment.content}"></span></span>
+                    <span>Created at: <span th:text="${comment.createdAt}"></span></span>
+                    </br>
+                    <span th:if="${#authorization.expression('hasAnyAuthority(''ADMIN'',''USER'')')}">
+                    <!-- Hiển thị quyền của người dùng -->
+                    <span th:text="'User_ST Role: ' + ${#authorization.expression('hasAuthority(''USER_ST'')')}"></span>
+                    <span th:text="'User Role: ' + ${#authorization.expression('hasAuthority(''USER'')')}"></span>
+                    <span th:text="'Admin Role: ' + ${#authorization.expression('hasAuthority(''ADMIN'')')}"></span>
+                </span>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+
+    <button id="show-comments-btn" class="btn btn-info mt-3">Show Comments</button>
+
 </div>
 <th:block th:replace="layout :: footer"></th:block>
 </body>

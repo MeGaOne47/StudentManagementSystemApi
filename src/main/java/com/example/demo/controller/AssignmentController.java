@@ -5,7 +5,9 @@ import com.example.demo.entity.AssignmentForm;
 import com.example.demo.entity.Comment;
 import com.example.demo.entity.Student;
 import com.example.demo.repository.IAssignmentRepository;
+import com.example.demo.repository.ICommentRepository;
 import com.example.demo.services.AssignmentService;
+import com.example.demo.services.CommentService;
 import com.example.demo.services.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -33,22 +35,27 @@ public class AssignmentController {
     private final AssignmentService assignmentService;
     private final StudentService studentService;
     private final IAssignmentRepository assignmentRepository;
+    private final CommentService commentService;
 
+    @Autowired
+    private ICommentRepository commentRepository;
 
     private final JdbcTemplate jdbcTemplate;
     @Autowired
-    public AssignmentController(AssignmentService assignmentService, StudentService studentService, IAssignmentRepository assignmentRepository, JdbcTemplate jdbcTemplate) {
+    public AssignmentController(AssignmentService assignmentService, StudentService studentService, IAssignmentRepository assignmentRepository, CommentService commentService, JdbcTemplate jdbcTemplate) {
         this.assignmentService = assignmentService;
         this.studentService = studentService;
         this.assignmentRepository = assignmentRepository;
+        this.commentService = commentService;
         this.jdbcTemplate = jdbcTemplate;
-
     }
 
     @GetMapping
     public String showAssignments(Model model) {
         List<Assignment> assignments = assignmentService.getAllAssignments();
         model.addAttribute("assignments", assignments);
+        List<Comment> comments = commentService.getAllComments();
+        model.addAttribute("comments", comments);
         return "assignment/list";
     }
 
@@ -199,6 +206,8 @@ public class AssignmentController {
         }
 
         model.addAttribute("assignment", assignment);
+        List<Comment> comments = commentRepository.findAll();
+        model.addAttribute("comments", comments);
 
         if (assignment.getStatus() != null && assignment.getStatus().equals("Submitted")) {
             byte[] submittedFile = assignment.getSubmittedFile();
@@ -219,29 +228,4 @@ public class AssignmentController {
 
         return "assignment/details";
     }
-
-    // Endpoint để thêm Comment cho Assignment
-    @PostMapping("/{assignmentId}/comments/add")
-    public String addComment(@PathVariable("assignmentId") Long assignmentId, @RequestParam("commentContent") String commentContent) {
-        Assignment assignment = assignmentRepository.findById(assignmentId).orElse(null);
-        if (assignment == null) {
-            // Xử lý khi không tìm thấy Assignment với assignmentId tương ứng
-            return "redirect:/assignments"; // Hoặc hiển thị thông báo lỗi khác
-        }
-
-        Comment comment = new Comment();
-        comment.setContent(commentContent);
-        assignment.addComment(comment);
-
-        assignmentRepository.save(assignment);
-
-        return "redirect:/assignments"; // Hoặc chuyển hướng đến trang khác
-    }
-
-
-
-
-
-
-    // Other methods for grading, commenting, etc.
 }

@@ -29,8 +29,8 @@ public class Assignment {
     @Column
     private String description;
 
-    @Column
-    private LocalDate dueDate;
+//    @Column
+//    private LocalDate dueDate;
 
     @Column
     private int grade;

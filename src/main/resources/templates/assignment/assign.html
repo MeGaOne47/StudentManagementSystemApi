@@ -16,7 +16,7 @@
     <div class="form-group">
       <label for="studentId">Student:</label>
       <select class="form-control" id="studentId" th:field="*{studentId}" required>
-        <option value="">-- Chọn học viên --</option>
+        <option value="">-- Select Student --</option>
         <option th:each="student : ${students}" th:value="${student.id}" th:text="${student.name}"></option>
       </select>
     </div>
